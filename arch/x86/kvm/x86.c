@@ -12988,6 +12988,8 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
 
 static int __init kvm_x86_init(void)
 {
+	printk(KERN_INFO "NEW x86 KVM MODULE");
+
 	kvm_mmu_x86_module_init();
 	return 0;
 }
