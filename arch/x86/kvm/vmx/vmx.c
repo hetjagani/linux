@@ -48,6 +48,7 @@
 #include <asm/spec-ctrl.h>
 #include <asm/virtext.h>
 #include <asm/vmx.h>
+#include <asm/msr.h>
 
 #include "capabilities.h"
 #include "cpuid.h"
@@ -6188,6 +6189,9 @@ unexpected_vmexit:
 
 static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 {
+	extern u64 total_cycles;
+	u64 start_ts = rdtsc();
+
 	int ret = __vmx_handle_exit(vcpu, exit_fastpath);
 
 	/*
@@ -6199,8 +6203,10 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 			vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
 
 		vcpu->run->flags |= KVM_RUN_X86_BUS_LOCK;
+		total_cycles += (rdtsc() - start_ts);
 		return 0;
 	}
+	total_cycles += (rdtsc() - start_ts);
 	return ret;
 }
 
