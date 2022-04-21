@@ -3,8 +3,8 @@
 ## Assignment 2
 
 Following are the commits ids for changes regarding Assignment 2
-* cb6023154
-* 03e8c3ae1
+* https://github.com/hetjagani/linux/commit/cb602315451a575386fa6490088ba66d7a548959
+* https://github.com/hetjagani/linux/commit/03e8c3ae172fc255821aadc8a893147cff471f0e
 
 > Fedora OS installed on Intel machine is used while doing this assignment
 
@@ -39,8 +39,10 @@ For CPUID leaf node `%eax=0x4FFFFFFE`:
     - `sudo modprobe kvm_intel`  
 6) To test the functionality KVM Virtual Machine Manager was installed to run VM on KVM using qemu.
 7) Created Ubuntu 20.04 server OS VM on KVM and ran the VM (Screenshot below)
+![Screenshot from 2022-04-21 10-08-16](https://user-images.githubusercontent.com/27214644/164514529-952d79f0-a08b-462c-90a1-76a4c996e969.png)
 
 8) Issued CPUID command with 0x4FFFFFFF as parameter and compared the values with printed values by our new KVM module. (Screenshots below)
-
+![Screenshot from 2022-04-21 10-09-30](https://user-images.githubusercontent.com/27214644/164514556-2b66ef1f-3741-41bd-81ae-cbcb90a22ea1.png)
 
 9) Issued CPUID command with 0x4FFFFFFE as parameter and compared the values with printed values by our new KVM module. (Screenshots below)
+![Screenshot from 2022-04-21 10-10-02](https://user-images.githubusercontent.com/27214644/164514598-80cc2a0c-e975-44cf-97e3-2653952782d1.png)
