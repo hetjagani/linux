@@ -19,6 +19,7 @@
 #include <asm/user.h>
 #include <asm/fpu/xstate.h>
 #include <asm/sgx.h>
+#include <asm/vmx.h>
 #include "cpuid.h"
 #include "lapic.h"
 #include "mmu.h"
@@ -1445,9 +1446,24 @@ EXPORT_SYMBOL(total_exits);
 u64 total_cycles;
 EXPORT_SYMBOL(total_cycles);
 
+u32 exits_count[74];
+EXPORT_SYMBOL(exits_count);
+
+u64 exits_cycles[74];
+EXPORT_SYMBOL(exits_cycles);
+
+bool not_defined_in_sdm(u32 exit_type) {
+	return  exit_type < 0 || exit_type == 35 || exit_type == 38 || exit_type == 42 || exit_type == 65 || exit_type > 69;
+}
+
+bool not_defined_in_kvm(u32 exit_type) {
+	return  exit_type < 0 || exit_type == 5 || exit_type == 6 || exit_type == 11 || exit_type == 35 || exit_type == 38 || exit_type == 17 || exit_type == 42 || exit_type == 65 || exit_type == 66 || (exit_type >= 69 && exit_type < 74) || exit_type > 74;
+}
+
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
+	u32 exit_number;
 
 	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
 		return 1;
@@ -1462,6 +1478,43 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 		ecx = total_cycles & 0xFFFFFFFF;
 		ebx = (total_cycles >> 32) & 0xFFFFFFFF;
 		printk(KERN_INFO "*** CPUID(0x4FFFFFFE) ***\n\tTotal Cycles: %lld\n\tEBX=%u & ECX=%u", total_cycles, ebx, ecx);
+	} else if(eax == 0x4FFFFFFD) {
+		if (not_defined_in_kvm(ecx)) {
+			printk(KERN_INFO "*** CPUID(0x4FFFFFFD) ***\n\tExit %u is not defined in KVM", ecx);
+			eax = 0;
+			ebx = 0;
+			ecx = 0;
+			edx = 0xFFFFFFFF;
+		} else if (not_defined_in_sdm(ecx)) {
+			printk(KERN_INFO "*** CPUID(0x4FFFFFFD) ***\n\tExit %u is not defined in SDM", ecx);
+			eax = 0;
+			ebx = 0;
+			ecx = 0;
+			edx = 0;
+		} else {
+			eax = exits_count[ecx];
+			printk(KERN_INFO "*** CPUID(0x4FFFFFFD) ***\n\tExit %u is called %u times.", ecx, eax);
+		}
+	} else if(eax == 0x4FFFFFFC) {
+		if (not_defined_in_kvm(ecx)) {
+			printk(KERN_INFO "*** CPUID(0x4FFFFFFC) ***\n\tExit %u is not defined in KVM", ecx);
+			eax = 0;
+			ebx = 0;
+			ecx = 0;
+			edx = 0xFFFFFFFF;
+		} else if (not_defined_in_sdm(ecx)) {
+			printk(KERN_INFO "*** CPUID(0x4FFFFFFC) ***\n\tExit %u is not defined in SDM", ecx);
+			eax = 0;
+			ebx = 0;
+			ecx = 0;
+			edx = 0;
+		} else {
+			printk(KERN_INFO "*** CPUID(0x4FFFFFFC) ***\n\tTotal Cycles for exit %u: %lld",ecx, exits_cycles[ecx]);
+			exit_number = ecx;
+			ecx = exits_cycles[exit_number] & 0xFFFFFFFF;
+			ebx = (exits_cycles[exit_number] >> 32) & 0xFFFFFFFF;
+			printk(KERN_INFO "*** CPUID(0x4FFFFFFC) ***\n\tTotal Cycles for exit %u: %lld\n\tEBX=%u & ECX=%u", exit_number, exits_cycles[exit_number], ebx, ecx);
+		}
 	} else {
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 	}
