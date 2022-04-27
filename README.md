@@ -11,7 +11,8 @@ Following are the commits for changes regarding Assignment 2
 In this assignment changes are done in KVM to modify behaviour of `cpuid` instruction when `%eax=0x4FFFFFFF` and `%eax=0x4FFFFFFE`
 
 For CPUID leaf node `%eax=0x4FFFFFFF`:
-* Return the total number of exits (all types) in %eax
+* Return the total number of exits (all types) in %eax   
+
 For CPUID leaf node `%eax=0x4FFFFFFE`:
 * Return the high 32 bits of the total time spent processing all exits in %ebx
 * Return the low 32 bits of the total time spent processing all exits in %ecx
@@ -59,7 +60,8 @@ In this assignment changes are done in KVM to modify behaviour of `cpuid` instru
 
 For CPUID leaf node `%eax=0x4FFFFFFD`:
 * Return the number of exits for the exit number provided (on input) in %ecx
-    - This value should be returned in %eax
+    - This value should be returned in %eax   
+    - 
 For CPUID leaf node `%eax=0x4FFFFFFC`:   
 * Return the time spent processing the exit number provided (on input) in %ecx
     - Return the high 32 bits of the total time spent for that exit in %ebx
@@ -88,6 +90,7 @@ For CPUID leaf node `%eax=0x4FFFFFFC`:
     - `sudo modprobe kvm_intel`  
 6) To test the functionality KVM Virtual Machine Manager was installed to run VM on KVM using qemu.
 7) Created CentOS 7 server OS VM on KVM and ran the VM (Screenshot below)
+![ss1](https://user-images.githubusercontent.com/27214644/165578949-f64403ad-8e69-4e18-9ebc-c45c8a225b55.png)
 
 
 8) Created script which takes leaf node param (i.e. value for `eax`) and calls `cpuid` for all exit types 1 to 75.
@@ -102,11 +105,15 @@ done
 ```
 
 9) Ran script with `0x4ffffffd` as parameter and compared the values with printed values by our new KVM module. (Screenshots below)
+![ss2](https://user-images.githubusercontent.com/27214644/165579069-9c6ce41d-bc39-4c6b-b6a4-1523c0019c1f.png)
+
 
 10) Ran script with `0x4ffffffc` as parameter and compared the values with printed values by our new KVM module. (Screenshots below)
+![ss3](https://user-images.githubusercontent.com/27214644/165579109-5396ae26-f3e9-4241-bb43-1931d27fcfec.png)
 
 #### Q3: Comment on the frequency of exits – does the number of exits increase at a stable rate? Or are theremore exits performed during certain VM operations? Approximately how many exits does a full VM boot entail?
 * Frequency of some exits such as HLT (# 12), CPUID (# 10) etc remains quiet stable because those exits are called fairly regularly and so number of exits increase at a stable rate. This can be observed in screenshot below.
+![ss4](https://user-images.githubusercontent.com/27214644/165579156-c01f4080-e888-47cf-852c-3e1650354af5.png)
 
 
 #### Q4: Of the exit types defined in the SDM, which are the most frequent? Least?
